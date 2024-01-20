@@ -39,10 +39,13 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
   private boolean isSingleUpdate = false;
 
 
+
   private Timer timer;
 
-  private  boolean Requested = false;
 
+  private Timer gpstimer;
+
+  private boolean Requested = false;
 
   RNlocationModule(ReactApplicationContext context) {
     super(context);
@@ -59,7 +62,6 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
   public String getName() {
     return AppConstants.MODULE_NAME;
   }
-
 
   @ReactMethod
   public boolean locationPermission() {
@@ -127,6 +129,10 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
       timer.cancel();
     }
 
+    if (gpstimer != null) {
+      gpstimer.cancel();
+    }
+
 
     locationManager.removeUpdates(GPSlistener);
   }
@@ -137,13 +143,16 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
     if (timer != null) {
       timer.cancel();
     }
+    if (gpstimer != null) {
+      gpstimer.cancel();
+    }
 
 
     locationManager.removeUpdates(Networklistener);
   }
 
 
-  private WritableNativeMap  convertLocation(Location location, String property){
+  private WritableNativeMap convertLocation(Location location, String property) {
     WritableNativeMap resultLocation = new WritableNativeMap();
     resultLocation.putString("provider", location.getProvider());
     resultLocation.putDouble("latitude", location.getLatitude());
@@ -153,7 +162,7 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
     resultLocation.putDouble("speed", location.getSpeed());
     resultLocation.putDouble("bearing", location.getBearing());
     resultLocation.putDouble("time", location.getTime());
-    resultLocation.putString("property",property);
+    resultLocation.putString("property", property);
     return resultLocation;
   }
 
@@ -161,22 +170,22 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
     if (ActivityCompat.checkSelfPermission(getReactApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getReactApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
       Location gpsLastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
       Log.d("gpsLastKnownLocation", String.valueOf(gpsLastKnownLocation));
-      if(gpsLastKnownLocation != null){
+      if (gpsLastKnownLocation != null) {
         WritableNativeMap resultLocation = convertLocation(gpsLastKnownLocation, "GPS-lastknown Location");
 
         promise.resolve(resultLocation);
-      }else{
+      } else {
         Location networkLastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         Log.d("netlocation", String.valueOf(networkLastKnownLocation));
-        if(networkLastKnownLocation != null){
+        if (networkLastKnownLocation != null) {
           WritableNativeMap resultLocation = convertLocation(networkLastKnownLocation, "Network -lastknown Location");
           promise.resolve(resultLocation);
-        }else{
+        } else {
           Log.d("timout null", "getLastKnownLocation: ");
           promise.reject("Location request timed out");
         }
       }
-    }else{
+    } else {
       Log.d("timout permission", "getLastKnownLocation: ");
 
       promise.reject("Location request timed out");
@@ -186,146 +195,183 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void getCurrentPosition(ReadableMap options, Promise promise) {
-    if(Requested) {
-      promise.reject("You have already requested Please wait until it is complete.");
-      return;
-    }
-    if (locationPermission()) {
+    try {
       int timout = AppConstants.DEFAULT_TIMOUT;
-      if(options.hasKey("timeout")){
+      if (options.hasKey("timeout")) {
         int config_timout = options.getInt("timeout");
         timout = config_timout;
       }
-      Log.d("timout", String.valueOf(timout));
-
-      boolean hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-      boolean hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-      if (!hasGps && !hasNetwork) {
-        buildAlertMessageNoGps();
-        promise.reject("GPS is required");
+      if(timout <= 10000) {
+        promise.reject("timeout must be greater than 10 seconds");
         return;
       }
-      if (hasGps || hasNetwork) {
-        Requested = true;
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-          @Override
-          public void run() {
-            try {
+      if (Requested) {
+        promise.reject("You have already requested Please wait until it is complete.");
+        return;
+      }
+      if (locationPermission()) {
+        Log.d("timout", String.valueOf(timout));
+
+        boolean hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        if (!hasGps && !hasNetwork) {
+          buildAlertMessageNoGps();
+          promise.reject("GPS is required");
+          return;
+        }
+        if (hasGps || hasNetwork) {
+          Requested = true;
+          timer = new Timer();
+          timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+              try {
+                removeGPSLocationUpdates();
+                removeNetworkLocationUpdates();
+                // getLastKnownLocation(promise);
+                promise.reject("Loction request timed out");
+              } catch (Exception ex) {
+
+                promise.reject("something went wrong");
+                ex.printStackTrace();
+              }
+            }
+          }, timout);
+
+          isSingleUpdate = true;
+
+
+          GPSlistener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+
+              if (isSingleUpdate) {
+                WritableNativeMap resultLocation = convertLocation(location, "GPS location");
+                promise.resolve(resultLocation);
+
+                isSingleUpdate = false;
+              }
               removeGPSLocationUpdates();
               removeNetworkLocationUpdates();
-              // getLastKnownLocation(promise);
-              promise.reject("Loction request timed out");
-            } catch (Exception ex) {
-              ex.printStackTrace();
+
+              Log.d("LOCATION POSITION", String.valueOf(location));
+
             }
-          }
-        }, timout);
 
-        isSingleUpdate = true;
+            @Override
+            public void onProviderEnabled(@NonNull String provider) {
 
-
-        GPSlistener  = new LocationListener() {
-          @Override
-          public void onLocationChanged(@NonNull Location location) {
-
-            if(isSingleUpdate){
-              WritableNativeMap resultLocation = convertLocation(location, "GPS location");
-              promise.resolve(resultLocation);
-
-              isSingleUpdate = false;
             }
-            removeGPSLocationUpdates();
-            removeNetworkLocationUpdates();
 
-            Log.d("LOCATION POSITION", String.valueOf(location));
+            @Override
+            public void onProviderDisabled(@NonNull String provider) {
 
-          }
-
-          @Override
-          public void onProviderEnabled(@NonNull String provider) {
-
-          }
-
-          @Override
-          public void onProviderDisabled(@NonNull String provider) {
-
-          }
-
-          @Override
-          public void onStatusChanged(String provider, int status, Bundle extras) {
-            Log.d("GPS status provider", provider);
-            Log.d("GPS status status", String.valueOf(status));
-
-          }
-
-        };
-        Networklistener  = new LocationListener() {
-          @Override
-          public void onLocationChanged(@NonNull Location location) {
-
-            if(isSingleUpdate){
-              WritableNativeMap resultLocation = convertLocation(location, "Network location");
-              promise.resolve(resultLocation);
-
-              isSingleUpdate = false;
             }
-            removeNetworkLocationUpdates();
-            removeGPSLocationUpdates();
 
-            Log.d("LOCATION POSITION", String.valueOf(location));
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+              Log.d("GPS status provider", provider);
+              Log.d("GPS status status", String.valueOf(status));
+
+            }
+
+          };
+          Networklistener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+
+              if (isSingleUpdate) {
+                WritableNativeMap resultLocation = convertLocation(location, "Network location");
+                promise.resolve(resultLocation);
+
+                isSingleUpdate = false;
+              }
+              removeNetworkLocationUpdates();
+              removeGPSLocationUpdates();
+
+              Log.d("LOCATION POSITION", String.valueOf(location));
+
+            }
+
+            @Override
+            public void onProviderEnabled(@NonNull String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(@NonNull String provider) {
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+              Log.d("NETWORK status provider", provider);
+              Log.d("NETWORK status status", String.valueOf(status));
+
+            }
+
+          };
+
+          if (hasGps) {
+
+
+            if (ActivityCompat.checkSelfPermission(getReactApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getReactApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+              promise.reject("Permission is required");
+              return;
+            }
+            locationManager.requestLocationUpdates(
+              LocationManager.GPS_PROVIDER,
+              0L, 0F, GPSlistener
+            );
+
+            //  locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, GPSlistener, null);
 
           }
 
-          @Override
-          public void onProviderEnabled(@NonNull String provider) {
+          gpstimer = new Timer();
+          gpstimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+              try {
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                  @Override
+                  public void run() {
+                    if (hasNetwork) {
+                      if (ActivityCompat.checkSelfPermission(getReactApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getReactApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-          }
+                        locationManager.requestLocationUpdates(
+                          LocationManager.NETWORK_PROVIDER,
+                          0L, 0F,
+                          Networklistener);
 
-          @Override
-          public void onProviderDisabled(@NonNull String provider) {
+                        //     locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, Networklistener, null);
 
-          }
-
-          @Override
-          public void onStatusChanged(String provider, int status, Bundle extras) {
-            Log.d("NETWORK status provider", provider);
-            Log.d("NETWORK status status", String.valueOf(status));
-
-          }
-
-        };
-
-        if (hasGps) {
+                      }
+                    }
+                  }
+                });
 
 
-          if (ActivityCompat.checkSelfPermission(getReactApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getReactApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            promise.reject("Permission is required");
-            return;
-          }
-          locationManager.requestLocationUpdates(
-            LocationManager.GPS_PROVIDER,
-            0L, 0F,GPSlistener
-          );
+              } catch (Exception ex) {
+                promise.reject("something went wrong");
+                ex.printStackTrace();
 
-          //  locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, GPSlistener, null);
+              }
+            }
+          }, 7000);
+
+
+
 
         }
-        if (hasNetwork) {
-          locationManager.requestLocationUpdates(
-            LocationManager.NETWORK_PROVIDER,
-            0L, 0F,
-            Networklistener);
-
-          //     locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, Networklistener, null);
-
-        }
-
-
-
+      } else {
+        promise.reject("Permission is required");
       }
-    }else{
-      promise.reject("Permission is required");
+    }
+
+    catch(Exception ex){
+      promise.reject("Something went wrong");
     }
   }
+
 }
