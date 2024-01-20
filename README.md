@@ -1,21 +1,27 @@
 # rnlocation
 
-React native geolocation service for iOS and android
+Geolocation service for Android using native modules
 
 ## Installation
 
 ```sh
-npm install rnlocation
+npm install https://github.com/karthick-av/rnlocation.git
+```
+
+```sh
+yarn add https://github.com/karthick-av/rnlocation.git
 ```
 
 ## Usage
 
 ```js
-import { multiply } from 'rnlocation';
+import RNLocation from 'rnlocation';
 
 // ...
 
-const result = await multiply(3, 7);
+   RNlocation.getCurrentPostion({timeout: 30000}).then((res) => {
+    
+     })
 ```
 
 ## Contributing
