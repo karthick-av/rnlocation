@@ -1,6 +1,7 @@
 {
   "name": "rnlocation",
   "version": "0.1.0",
+  "private": true,
   "description": "React native geolocation service for iOS and android",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
