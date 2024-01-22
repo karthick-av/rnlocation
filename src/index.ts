@@ -27,6 +27,17 @@ class RNLocation{
      static promptGPSIfNeeded = ():void => {
         modules.promptGPSIfNeeded();
      }
+
+     static isServiceRunning = async(): Promise<boolean> => {
+      return await modules.isServiceRunning();
+    }
+
+    static startBackgroundService = ():void => {
+      modules.startBackgroundService();
+   }
+   static StopBackgroundService = ():void => {
+    modules.StopBackgroundService();
+ }
 }
 
 export default RNLocation;

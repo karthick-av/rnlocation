@@ -416,5 +416,74 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
     }
 
 
+@ReactMethod
+    public void isServiceRunning(Promise promise) {
+        ActivityManager activityManager = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            activityManager = (ActivityManager)  getReactApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+        }
+        if (activityManager != null) {
+            for (ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
+                if (BackgroundLocationService.class.getName().equals(service.service.getClassName())) {
+                    if(service.foreground){
+                       promise.resolve(true);
+                    }
+                }
+            }
+
+            promise.resolve(false);
+        }
+    promise.resolve(false);
+    }
+
+    public boolean isServiceLocationRunning() {
+        ActivityManager activityManager = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            activityManager = (ActivityManager)  getReactApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+        }
+        if (activityManager != null) {
+            for (ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
+                if (BackgroundLocationService.class.getName().equals(service.service.getClassName())) {
+                    if(service.foreground){
+                        return true;
+                    }
+                }
+            }
+            return  false;
+        }
+        return  false;
+    }
+
+
+    @ReactMethod
+    public void startBackgroundService() {
+        if (ActivityCompat.checkSelfPermission(getReactApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getReactApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getReactApplicationContext(), android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
+        if (!isServiceLocationRunning()) {
+
+            Intent intent = new Intent(getReactApplicationContext(), BackgroundLocationService.class);
+            intent.setAction(AppConstants.ACTION_START_LOCATION_SERVICE);
+            getReactApplicationContext().startService(intent);
+            Toast.makeText(getReactApplicationContext(), "Start Location Service", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+
+
+
+    @ReactMethod
+    public  void StopBackgroundService(){
+        if(isServiceLocationRunning()){
+            Intent intent = new Intent(getReactApplicationContext(), BackgroundLocationService.class);
+            intent.setAction(AppConstants.ACTION_STOP_LOCATION_SERVICE);
+            getReactApplicationContext().startService(intent);
+            Toast.makeText(getReactApplicationContext(),"Stop Location Service",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
 
 }
