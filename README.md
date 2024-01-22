@@ -22,6 +22,8 @@ For Android you need to define the location permissions on `AndroidManifest.xml`
 
 <!-- Define ACCESS_COARSE_LOCATION if you will use enableHighAccuracy=false  -->
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+ <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 <!-- 
 Apps that target Android 9 (API level 28) or higher and use foreground services need to request the FOREGROUND_SERVICE in the app manifest, as shown in the following code snippet. This is a normal permission, so the system automatically grants it to the requesting app. -->
  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
