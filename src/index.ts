@@ -15,6 +15,18 @@ class RNLocation{
             throw error;
           }
     }
+
+    static isGPSenabled = async():Promise<boolean> => {
+      return await modules.isGPSenabled();
+     }
+ 
+     
+     static requestPermissionIfNeeded = async():Promise<boolean> => {
+       return await modules.requestPermissionIfNeeded();
+     }
+     static promptGPSIfNeeded = ():void => {
+        modules.promptGPSIfNeeded();
+     }
 }
 
 export default RNLocation;
