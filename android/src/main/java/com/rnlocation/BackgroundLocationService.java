@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.content.res.Resources;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -102,6 +103,8 @@ public class BackgroundLocationService extends Service {
         String channelId = "background_notification_channel";
         String TITLE = "Location tracking";
         String BODY = "This app keeps track of your location in the background.";
+      Resources res = context.getResources();
+      String packageName = context.getPackageName();
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -119,16 +122,17 @@ public class BackgroundLocationService extends Service {
         PendingIntent actionPendingIntent =
                 PendingIntent.getBroadcast(context, 0, actionIntent, PendingIntent.FLAG_IMMUTABLE);
 
+         int AppIcon = res.getIdentifier("ic_launcher", "mipmap", packageName);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 context,
                 channelId
         );
-        builder.setSmallIcon(R.mipmap.ic_launcher);
+        builder.setSmallIcon(AppIcon);
         builder.setContentTitle(TITLE);
         builder.setDefaults(NotificationCompat.DEFAULT_ALL);
         builder.setContentText(BODY);
         builder.setContentIntent(pendingIntent);
-        builder.addAction(R.mipmap.ic_launcher, "Stop tracking", actionPendingIntent);
+        builder.addAction(AppIcon, "Stop tracking", actionPendingIntent);
 
         builder.setAutoCancel(false);
         builder.setPriority(NotificationCompat.PRIORITY_MAX);
