@@ -40,6 +40,11 @@ Apps that target Android 9 (API level 28) or higher and use foreground services 
             android:enabled="true"
             android:exported="false"
             />
+
+ <receiver
+            android:name=".NotificationActionReceiver"
+            android:enabled="true"
+            android:exported="false" />
 ```
 
 

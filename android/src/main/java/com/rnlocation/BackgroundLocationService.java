@@ -1,96 +1,153 @@
-//package com.rnlocation;
-//
-//import android.app.NotificationChannel;
-//import android.app.NotificationManager;
-//import android.app.PendingIntent;
-//import android.app.Service;
-//import android.content.Context;
-//import android.content.Intent;
-//import android.content.pm.PackageManager;
-//import android.location.Location;
-//import android.location.LocationListener;
-//import android.location.LocationManager;
-//import android.os.Build;
-//import android.os.Bundle;
-//import android.os.IBinder;
-//import android.util.Log;
-//
-//public class BackgroundLocationService extends Service {
-//    private LocationManager locationManager;
-//    private LocationListener GPSlistener;
-//
-//    private LocationListener Networklistener;
-//
-//    @Nullable
-//    @Override
-//    public IBinder onBind(Intent intent) {
-//        return null;
-//    }
-//
-//    @Override
-//    public int onStartCommand(Intent intent, int flags, int startId) {
-//        try {
-//            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//
-//
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//        }
-//        if (intent != null) {
-//            String action = intent.getAction();
-//            if (action != null) {
-//                if (action.equals(AppConstants.ACTION_START_LOCATION_SERVICE)) {
-//                    startLocationService();
-//                } else if (action.equals(AppConstants.ACTION_STOP_LOCATION_SERVICE)) {
-//                    stopLocationService();
-//                }
-//            }
-//        }
-//        return super.onStartCommand(intent, flags, startId);
-//    }
-//
-//
-//    private void startLocationService() {
-//        String channelId = "background_notification_channel";
-//        String TITLE = "test";
-//        String BODY = "test";
-//
-//        NotificationManager notificationManager =
-//                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//        Intent resultIntent = new Intent(this, MainActivity.class);
-//
-//        PendingIntent pendingIntent = PendingIntent.getActivity(
-//                getApplicationContext(),
-//                0,
-//                resultIntent,
-//                PendingIntent.FLAG_IMMUTABLE
-//        );
-//        NotificationCompat.Builder builder = new NotificationCompat.Builder(
-//                getApplicationContext(),
-//                channelId
-//        );
-//        builder.setSmallIcon(R.mipmap.ic_launcher);
-//        builder.setContentTitle(TITLE);
-//        builder.setDefaults(NotificationCompat.DEFAULT_ALL);
-//        builder.setContentText(BODY);
-//        builder.setContentIntent(pendingIntent);
-//        builder.setAutoCancel(false);
-//        builder.setPriority(NotificationCompat.PRIORITY_MAX);
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            if (notificationManager != null
-//                    && notificationManager.getNotificationChannel(channelId) == null) {
-//
-//                NotificationChannel notificationChannel = new NotificationChannel(
-//                        channelId,
-//                        "Location Service",
-//                        NotificationManager.IMPORTANCE_HIGH
-//                );
-//
-//                notificationChannel.setDescription("location service");
-//                notificationManager.createNotificationChannel(notificationChannel);
-//            }
-//        }
+package com.rnlocation;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+
+public class BackgroundLocationService extends Service {
+    private static final int TWO_MINUTES = 1000 * 60 * 1;
+    public LocationManager locationManager;
+    public MyLocationListener listener;
+    public Location previousBestLocation = null;
+
+    Context context;
+
+    Intent intent;
+    int counter = 0;
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        // intent = new Intent(BROADCAST_ACTION);
+        context = this;
+    }
+
+    @Override
+    public void onDestroy() {
+        // handler.removeCallbacks(sendUpdatesToUI);
+        super.onDestroy();
+        Log.v("STOP_SERVICE ==>", "DONE");
+        locationManager.removeUpdates(listener);
+        stopForeground(true);
+
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        try {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            listener = new MyLocationListener();
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 4000, 0, listener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 4000, 0, listener);
+
+            }
+
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        if (intent != null) {
+            String action = intent.getAction();
+            if (action != null) {
+                if (action.equals(AppConstants.ACTION_START_LOCATION_SERVICE)) {
+                    startLocationService();
+                } else if (action.equals(AppConstants.ACTION_STOP_LOCATION_SERVICE)) {
+                    stopLocationService();
+                }
+            }
+        }
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    /** Checks whether two providers are the same */
+    private boolean isSameProvider(String provider1, String provider2) {
+        if (provider1 == null) {
+            return provider2 == null;
+        }
+        return provider1.equals(provider2);
+    }
+
+    public Class getMainActivityClass() {
+        String packageName = context.getPackageName();
+        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+        String className = launchIntent.getComponent().getClassName();
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    private void startLocationService() {
+        Class intentClass = getMainActivityClass();
+        String channelId = "background_notification_channel";
+        String TITLE = "Location tracking";
+        String BODY = "This app keeps track of your location in the background.";
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        Intent resultIntent = new Intent(context, intentClass);
+        resultIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                context,
+                0,
+                resultIntent,
+                PendingIntent.FLAG_IMMUTABLE
+        );
+        Intent actionIntent = new Intent(context, NotificationActionReceiver.class);
+        actionIntent.setAction("STOP_TRACKING"); // Customize with your action name
+        PendingIntent actionPendingIntent =
+                PendingIntent.getBroadcast(context, 0, actionIntent, PendingIntent.FLAG_IMMUTABLE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(
+                context,
+                channelId
+        );
+        builder.setSmallIcon(R.mipmap.ic_launcher);
+        builder.setContentTitle(TITLE);
+        builder.setDefaults(NotificationCompat.DEFAULT_ALL);
+        builder.setContentText(BODY);
+        builder.setContentIntent(pendingIntent);
+        builder.addAction(R.mipmap.ic_launcher, "Stop tracking", actionPendingIntent);
+
+        builder.setAutoCancel(false);
+        builder.setPriority(NotificationCompat.PRIORITY_MAX);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (notificationManager != null
+                    && notificationManager.getNotificationChannel(channelId) == null) {
+
+                NotificationChannel notificationChannel = new NotificationChannel(
+                        channelId,
+                        "Location Service",
+                        NotificationManager.IMPORTANCE_HIGH
+                );
+
+                notificationChannel.setDescription("location service");
+                notificationManager.createNotificationChannel(notificationChannel);
+            }
+        }
 //        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 //            // TODO: Consider calling
 //            //    ActivityCompat#requestPermissions
@@ -101,61 +158,7 @@
 //            // for ActivityCompat#requestPermissions for more details.
 //            return;
 //        }
-//
-//        GPSlistener = new LocationListener() {
-//            @Override
-//            public void onLocationChanged(@NonNull Location location) {
-//
-//
-//                Log.d("BACKGROUND LOCATION", String.valueOf(location));
-//
-//            }
-//
-//            @Override
-//            public void onProviderEnabled(@NonNull String provider) {
-//
-//            }
-//
-//            @Override
-//            public void onProviderDisabled(@NonNull String provider) {
-//
-//            }
-//
-//            @Override
-//            public void onStatusChanged(String provider, int status, Bundle extras) {
-//                Log.d("GPS status provider", provider);
-//                Log.d("GPS status status", String.valueOf(status));
-//
-//            }
-//
-//        };
-//        Networklistener = new LocationListener() {
-//            @Override
-//            public void onLocationChanged(@NonNull Location location) {
-//
-//
-//                Log.d("BACKGROUND LOCATION", String.valueOf(location));
-//
-//            }
-//
-//            @Override
-//            public void onProviderEnabled(@NonNull String provider) {
-//
-//            }
-//
-//            @Override
-//            public void onProviderDisabled(@NonNull String provider) {
-//
-//            }
-//
-//            @Override
-//            public void onStatusChanged(String provider, int status, Bundle extras) {
-//                Log.d("NETWORK status provider", provider);
-//                Log.d("NETWORK status status", String.valueOf(status));
-//
-//            }
-//
-//        };
+
 //
 //        locationManager.requestLocationUpdates(
 //                LocationManager.GPS_PROVIDER,
@@ -165,26 +168,58 @@
 //                LocationManager.NETWORK_PROVIDER,
 //                5000, 10, Networklistener
 //        );
-//        startForeground(AppConstants.LOCATION_SERVICE_ID, builder.build());
-//    }
-//
-//
-//    private  void stopLocationService(){
-//                if(locationManager != null){
-//                    Log.d("STOP", "stopLocationService: ");
-//                    locationManager.removeUpdates(GPSlistener);
-//                    locationManager.removeUpdates(Networklistener);
-//                }
-//         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR) {
-//             stopForeground(true);
-//         }else{
-//                          Intent intent = new Intent(getApplicationContext(), BackgroundLocationService.class);
-//             intent.setAction(AppConstants.ACTION_STOP_LOCATION_SERVICE);
-//             getApplicationContext().stopService(intent);
-//
-//         }
-//         stopSelf();
-//
-//
-//    }
-//}
+  //      startForeground(AppConstants.LOCATION_SERVICE_ID, builder.build());
+
+        startForeground(AppConstants.LOCATION_SERVICE_ID, builder.build());
+
+    }
+
+
+    private  void stopLocationService(){
+        if(locationManager != null){
+            Log.d("STOP", "stopLocationService: ");
+
+            Log.v("STOP_SERVICE", "DONE");
+            locationManager.removeUpdates(listener);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR) {
+            stopForeground(true);
+            Intent intent = new Intent(context, BackgroundLocationService.class);
+            intent.setAction(AppConstants.ACTION_STOP_LOCATION_SERVICE);
+            context.stopService(intent);
+        }else{
+            Intent intent = new Intent(context, BackgroundLocationService.class);
+            intent.setAction(AppConstants.ACTION_STOP_LOCATION_SERVICE);
+            context.stopService(intent);
+
+        }
+        stopSelf();
+
+
+    }
+
+    public class MyLocationListener implements LocationListener{
+
+        public void onLocationChanged(final Location loc)
+        {
+            Log.i("**********", "Location changed  " + loc.getLatitude() + "  " + loc.getLongitude());
+
+        }
+
+        public void onProviderDisabled(String provider)
+        {
+        }
+
+
+        public void onProviderEnabled(String provider)
+        {
+        }
+
+
+        public void onStatusChanged(String provider, int status, Bundle extras)
+        {
+
+        }
+
+    }
+}
