@@ -16,7 +16,6 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
-
 public class BackgroundLocationService extends Service {
     private static final int TWO_MINUTES = 1000 * 60 * 1;
     public LocationManager locationManager;
