@@ -484,6 +484,16 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
         }
     }
 
+@ReactMethod
+    public void WifiSettings(){
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+        Intent panelIntent = new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY);
+       getCurrentActivity().startActivity(panelIntent);
+    } else {
+        getCurrentActivity().startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+        // Your code for versions below Android 10
+    }
+}
 
 
 }
