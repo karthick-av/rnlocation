@@ -1,6 +1,5 @@
 package com.rnlocation;
 
-import android.app.ActivityManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -22,9 +21,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.WritableNativeMap;
-
 public class BackgroundLocationService extends Service {
     private LocationManager locationManager;
     private LocationListener GPSlistener;
@@ -40,7 +36,7 @@ public class BackgroundLocationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
-            locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 
         } catch (Exception ex) {
@@ -197,5 +193,4 @@ public class BackgroundLocationService extends Service {
 
 
     }
-
 }
