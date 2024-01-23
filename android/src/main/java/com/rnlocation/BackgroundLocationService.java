@@ -41,60 +41,6 @@ public class BackgroundLocationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
             locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-            GPSlistener = new LocationListener() {
-                @Override
-                public void onLocationChanged(@NonNull Location location) {
-
-
-                    Log.d("BACKGROUND LOCATION", String.valueOf(location));
-
-                }
-
-                @Override
-                public void onProviderEnabled(@NonNull String provider) {
-
-                }
-
-                @Override
-                public void onProviderDisabled(@NonNull String provider) {
-
-                }
-
-                @Override
-                public void onStatusChanged(String provider, int status, Bundle extras) {
-                    Log.d("GPS status provider", provider);
-                    Log.d("GPS status status", String.valueOf(status));
-
-                }
-
-            };
-            Networklistener = new LocationListener() {
-                @Override
-                public void onLocationChanged(@NonNull Location location) {
-
-
-                    Log.d("BACKGROUND LOCATION", String.valueOf(location));
-
-                }
-
-                @Override
-                public void onProviderEnabled(@NonNull String provider) {
-
-                }
-
-                @Override
-                public void onProviderDisabled(@NonNull String provider) {
-
-                }
-
-                @Override
-                public void onStatusChanged(String provider, int status, Bundle extras) {
-                    Log.d("NETWORK status provider", provider);
-                    Log.d("NETWORK status status", String.valueOf(status));
-
-                }
-
-            };
 
 
         } catch (Exception ex) {
@@ -165,6 +111,62 @@ public class BackgroundLocationService extends Service {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
+
+        GPSlistener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+
+
+                Log.d("BACKGROUND LOCATION", String.valueOf(location));
+
+            }
+
+            @Override
+            public void onProviderEnabled(@NonNull String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(@NonNull String provider) {
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                Log.d("GPS status provider", provider);
+                Log.d("GPS status status", String.valueOf(status));
+
+            }
+
+        };
+        Networklistener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+
+
+                Log.d("BACKGROUND LOCATION", String.valueOf(location));
+
+            }
+
+            @Override
+            public void onProviderEnabled(@NonNull String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(@NonNull String provider) {
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                Log.d("NETWORK status provider", provider);
+                Log.d("NETWORK status status", String.valueOf(status));
+
+            }
+
+        };
+
         locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER,
                 5000, 10, GPSlistener
@@ -179,6 +181,7 @@ public class BackgroundLocationService extends Service {
 
     private  void stopLocationService(){
                 if(locationManager != null){
+                    Log.d("STOP", "stopLocationService: ");
                     locationManager.removeUpdates(GPSlistener);
                     locationManager.removeUpdates(Networklistener);
                 }
