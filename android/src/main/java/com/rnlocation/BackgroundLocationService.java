@@ -1,4 +1,5 @@
 package com.rnlocation;
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -51,8 +52,7 @@ public class BackgroundLocationService extends Service {
 
     }
 
-     @SuppressLint("MissingPermission")
-   
+    @SuppressLint("MissingPermission")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
