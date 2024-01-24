@@ -51,16 +51,18 @@ public class BackgroundLocationService extends Service {
 
     }
 
+     @SuppressLint("MissingPermission")
+   
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             listener = new MyLocationListener();
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+          //  if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 4000, 0, listener);
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 4000, 0, listener);
 
-            }
+            //}
 
 
         } catch (Exception ex) {

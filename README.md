@@ -36,13 +36,13 @@ Apps that target Android 9 (API level 28) or higher and use foreground services 
 ** Make sure to add an after ```</activity>```
 ```xml
   <service
-            android:name=".BackgroundLocationService"
-            android:enabled="true"
+           android:name="com.rnlocation.BackgroundLocationService"
+             android:enabled="true"
             android:exported="false"
             />
 
  <receiver
-            android:name=".NotificationActionReceiver"
+            android:name="com.rnlocation.NotificationActionReceiver"
             android:enabled="true"
             android:exported="false" />
 ```
