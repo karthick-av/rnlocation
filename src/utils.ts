@@ -2,7 +2,7 @@
 export type location_options ={
   timeout: number,
   gps_timeout: number
-} 
+}; 
 
 export const DEFAULT_OPTIONS: location_options = {
   timeout: 60000,
@@ -11,14 +11,14 @@ export const DEFAULT_OPTIONS: location_options = {
 
 
   export type LOCATION_RESPONSE = {
-    accuracy: number
-    altitude: number
-    bearing: number
-    latitude: number
-    longitude: number
-    provider: string
-    speed: number
-    time: number
+    accuracy: number;
+    altitude: number;
+    bearing: number;
+    latitude: number;
+    longitude: number;
+    provider: string;
+    speed: number;
+    time: number;
   }
 
 

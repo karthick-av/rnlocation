@@ -496,5 +496,18 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
     }
 }
 
+  @ReactMethod
+  public  void getUniqueId(Promise promise){
+    try{
+      String androidId = null;
+      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.CUPCAKE) {
+        androidId = Settings.Secure.getString(getReactApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+      }
+      promise.resolve(androidId);
+    }
+    catch (Exception ex){gigi
+      promise.reject(ex);
+    }
+  }
 
 }

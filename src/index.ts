@@ -1,7 +1,7 @@
 
 
-import { NativeModules } from "react-native";
-import { DEFAULT_OPTIONS, MODULE_NAME, type LOCATION_RESPONSE, type location_options } from "./utils";
+import { NativeModules } from 'react-native';
+import { DEFAULT_OPTIONS, MODULE_NAME, type LOCATION_RESPONSE, type location_options } from './utils';
 
 const { [MODULE_NAME]: modules } = NativeModules;
 
@@ -41,6 +41,14 @@ class RNLocation {
 
   static WifiSettings = (): void => {
     modules.WifiSettings();
+  }
+
+  static getUniqueId = async():Promise<String> => {
+    try{
+      return await modules.getUniqueId();
+    }catch(e){
+      throw e;
+    }
   }
 }
 
