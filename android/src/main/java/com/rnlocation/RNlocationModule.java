@@ -505,7 +505,7 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
       }
       promise.resolve(androidId);
     }
-    catch (Exception ex){gigi
+    catch (Exception ex){
       promise.reject(ex);
     }
   }
