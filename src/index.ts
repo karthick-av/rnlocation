@@ -50,6 +50,10 @@ class RNLocation {
       throw e;
     }
   }
+
+  static clear = (): void => {
+    modules.clear();
+  }
 }
 
 export default RNLocation;

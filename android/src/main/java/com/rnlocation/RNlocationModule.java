@@ -156,6 +156,7 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
 
     public void removeGPSLocationUpdates() {
           Requested = false;
+           isSingleUpdate = false;
         if (timer != null) {
             timer.cancel();
         }
@@ -171,6 +172,7 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
 
     public void removeNetworkLocationUpdates() {
         Requested = false;
+         isSingleUpdate = false;
         if (timer != null) {
             timer.cancel();
         }
@@ -180,6 +182,25 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
 
 
         locationManager.removeUpdates(Networklistener);
+    }
+
+
+     @ReactMethod
+    public  void clear(){
+    Requested = false;
+    isSingleUpdate = false;
+    
+         if (timer != null) {
+            timer.cancel();
+        }
+        if (gpstimer != null) {
+            gpstimer.cancel();
+        }
+
+
+        locationManager.removeUpdates(GPSlistener);
+        locationManager.removeUpdates(Networklistener);
+
     }
 
 
