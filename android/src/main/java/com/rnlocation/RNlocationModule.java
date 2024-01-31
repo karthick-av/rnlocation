@@ -155,7 +155,7 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
     }
 
     public void removeGPSLocationUpdates() {
-
+          Requested = false;
         if (timer != null) {
             timer.cancel();
         }
