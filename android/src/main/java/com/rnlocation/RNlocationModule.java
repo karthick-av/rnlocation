@@ -272,7 +272,7 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
                                 // getLastKnownLocation(promise);
                                 promise.reject("Loction request timed out");
                             } catch (Exception ex) {
-
+                                   Requested = false;
                                 promise.reject("something went wrong");
                                 ex.printStackTrace();
                             }
@@ -394,6 +394,7 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
 
 
                             } catch (Exception ex) {
+                               Requested = false;
                                 promise.reject("something went wrong");
                                 ex.printStackTrace();
 
