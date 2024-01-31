@@ -166,7 +166,9 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
         }
 
 
+       if(GPSlistener != null){
         locationManager.removeUpdates(GPSlistener);
+        }
     }
 
 
@@ -181,7 +183,10 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
         }
 
 
+         if(Networklistener != null){
+        
         locationManager.removeUpdates(Networklistener);
+        }
     }
 
 
@@ -198,9 +203,16 @@ public class RNlocationModule extends ReactContextBaseJavaModule {
         }
 
 
+        if(GPSlistener != null){
         locationManager.removeUpdates(GPSlistener);
+        }
+        if(Networklistener != null){
+        
         locationManager.removeUpdates(Networklistener);
+        }
 
+        
+ Log.d("Requested ==>", String.valueOf(Requested));
     }
 
 
