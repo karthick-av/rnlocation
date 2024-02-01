@@ -4,7 +4,7 @@
 
 @implementation LocationModule: NSObject
 
-RCT_EXPORT_MODULE(RNlocationNativeModule);
+RCT_EXPORT_MODULE(RNlocation);
 
 NSTimer* mTimer;
 CLLocationManager* mLocationManager;

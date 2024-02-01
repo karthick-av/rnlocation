@@ -1,4 +1,5 @@
 
+import {  Platform } from 'react-native';
 export type location_options ={
   timeout: number,
   gps_timeout: number
@@ -22,4 +23,4 @@ export const DEFAULT_OPTIONS: location_options = {
   }
 
 
-  export const MODULE_NAME = "RNlocationNativeModule";
+  export const MODULE_NAME =   Platform.OS == "ios" ? "RNlocation" : "RNlocationNativeModule";
