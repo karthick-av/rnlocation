@@ -1,6 +1,6 @@
 
 
-import { NativeModules } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 import { DEFAULT_OPTIONS, MODULE_NAME, type LOCATION_RESPONSE, type location_options } from './utils';
 
 const { [MODULE_NAME]: modules } = NativeModules;
@@ -17,34 +17,41 @@ class RNLocation {
   }
 
   static isGPSenabled = async (): Promise<boolean> => {
+   if(Platform.OS == "ios") throw "IOS not available";
     return await modules.isGPSenabled();
   }
 
 
   static requestPermissionIfNeeded = async (): Promise<boolean> => {
-    return await modules.requestPermissionIfNeeded();
+    return Platform.OS == "ios" ? await modules.requestPermissionIfNeeded({}) : await modules.requestPermissionIfNeeded();
   }
   static promptGPSIfNeeded = (): void => {
+    if(Platform.OS == "ios") throw "IOS not available";
     modules.promptGPSIfNeeded();
   }
 
   static isServiceRunning = async (): Promise<boolean> => {
+    if(Platform.OS == "ios") throw "IOS not available";
     return await modules.isServiceRunning();
   }
 
   static startBackgroundService = (): void => {
-    modules.startBackgroundService();
+    if(Platform.OS == "ios") throw "IOS not available";
+   modules.startBackgroundService();
   }
   static StopBackgroundService = (): void => {
+    if(Platform.OS == "ios") throw "IOS not available";
     modules.StopBackgroundService();
   }
 
   static WifiSettings = (): void => {
+    if(Platform.OS == "ios") throw "IOS not available";
     modules.WifiSettings();
   }
 
   static getUniqueId = async():Promise<String> => {
-    try{
+    if(Platform.OS == "ios") throw "IOS not available";
+   try{
       return await modules.getUniqueId();
     }catch(e){
       throw e;
@@ -52,7 +59,8 @@ class RNLocation {
   }
 
   static clear = (): void => {
-    modules.clear();
+    if(Platform.OS == "ios") throw "IOS not available";
+   modules.clear();
   }
 }
 
