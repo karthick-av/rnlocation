@@ -23,7 +23,7 @@ class RNLocation {
 
 
   static requestPermissionIfNeeded = async (): Promise<boolean> => {
-    return Platform.OS == "ios" ? await modules.requestPermissionIfNeeded({}) : await modules.requestPermissionIfNeeded();
+    return await modules.requestPermissionIfNeeded();
   }
   static promptGPSIfNeeded = (): void => {
     if(Platform.OS == "ios") throw "IOS not available";
