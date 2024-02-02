@@ -30,8 +30,6 @@
 		5A56ACFE2B6CBCE4009ADCCA /* libRNlocationNativeModule.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNlocationNativeModule.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A56AD012B6CBCE4009ADCCA /* RNlocationNativeModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNlocationNativeModule.h; sourceTree = "<group>"; };
 		5A56AD022B6CBCE4009ADCCA /* RNlocationNativeModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNlocationNativeModule.m; sourceTree = "<group>"; };
-		5A56AD0A2B6CBD2D009ADCCA /* RNlocationNativeModule-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNlocationNativeModule-Bridging-Header.h"; sourceTree = "<group>"; };
-		5A56AD0B2B6CBD2D009ADCCA /* RNlocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNlocation.swift; sourceTree = "<group>"; };
 		5A56AD0D2B6CBD5A009ADCCA /* RNlocation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNlocation.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -52,7 +50,6 @@
 				5A56AD0B2B6CBD2D009ADCCA /* RNlocation.swift */,
 				5A56AD002B6CBCE4009ADCCA /* RNlocationNativeModule */,
 				5A56ACFF2B6CBCE4009ADCCA /* Products */,
-				5A56AD0A2B6CBD2D009ADCCA /* RNlocationNativeModule-Bridging-Header.h */,
 			);
 			sourceTree = "<group>";
 		};
@@ -260,8 +257,6 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "RNlocationNativeModule-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -275,8 +270,6 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "RNlocationNativeModule-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
