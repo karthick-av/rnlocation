@@ -1,10 +1,24 @@
+//
+//  RNlocationNativeModule.m
+//  RNlocationNativeModule
+//
+//  Created by VeeTee Technologies on 02/02/24.
+//
+
+//#import "RNlocationNativeModule.h"
+
+//@implementation RNlocationNativeModule
+
+//@end
+
+
 #import <Foundation/Foundation.h>
-#import "RNlocation-Bridging-Header.h"
+#import "RNlocationNativeModule.h"
 #import <React/RCTLog.h>
 
-@implementation LocationModule: NSObject
+@implementation RNlocationNativeModule: NSObject
 
-RCT_EXPORT_MODULE(RNlocation);
+RCT_EXPORT_MODULE(RNlocationNativeModule);
 
 NSTimer* mTimer;
 CLLocationManager* mLocationManager;
