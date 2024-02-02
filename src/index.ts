@@ -17,7 +17,7 @@ class RNLocation {
   }
 
   static isGPSenabled = async (): Promise<boolean> => {
-   if(Platform.OS == "ios") throw "IOS not available";
+   if(Platform.OS == "ios") return false;
     return await modules.isGPSenabled();
   }
 
@@ -26,31 +26,31 @@ class RNLocation {
     return await modules.requestPermissionIfNeeded();
   }
   static promptGPSIfNeeded = (): void => {
-    if(Platform.OS == "ios") throw "IOS not available";
+    if(Platform.OS == "ios")return;
     modules.promptGPSIfNeeded();
   }
 
   static isServiceRunning = async (): Promise<boolean> => {
-    if(Platform.OS == "ios") throw "IOS not available";
+    if(Platform.OS == "ios") return false;
     return await modules.isServiceRunning();
   }
 
   static startBackgroundService = (): void => {
-    if(Platform.OS == "ios") throw "IOS not available";
+    if(Platform.OS == "ios")return;
    modules.startBackgroundService();
   }
   static StopBackgroundService = (): void => {
-    if(Platform.OS == "ios") throw "IOS not available";
+    if(Platform.OS == "ios") return;
     modules.StopBackgroundService();
   }
 
   static WifiSettings = (): void => {
-    if(Platform.OS == "ios") throw "IOS not available";
+    if(Platform.OS == "ios") return;
     modules.WifiSettings();
   }
 
   static getUniqueId = async():Promise<String> => {
-    if(Platform.OS == "ios") throw "IOS not available";
+    if(Platform.OS == "ios") return "";
    try{
       return await modules.getUniqueId();
     }catch(e){
@@ -59,7 +59,7 @@ class RNLocation {
   }
 
   static clear = (): void => {
-    if(Platform.OS == "ios") throw "IOS not available";
+    if(Platform.OS == "ios") return;
    modules.clear();
   }
 }
