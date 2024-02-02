@@ -23,4 +23,4 @@ export const DEFAULT_OPTIONS: location_options = {
   }
 
 
-  export const MODULE_NAME =   Platform.OS == "ios" ? "RNlocation" : "RNlocationNativeModule";
+  export const MODULE_NAME =   "RNlocationNativeModule";

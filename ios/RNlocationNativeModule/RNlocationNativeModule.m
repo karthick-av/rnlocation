@@ -27,27 +27,24 @@ RCTPromiseRejectBlock mReject;
 double mTimeout;
 
 
-RCT_EXPORT_METHOD(requestPermissionIfNeeded: promise: (RCTPromiseResolveBlock) resolve
-                  rejecter: (RCTPromiseRejectBlock) reject) {
-  
-  
- // @try {
+RCT_EXPORT_METHOD(requestPermissionIfNeeded:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+    
     CLLocationManager *locationManager = [[CLLocationManager alloc] init];
-    locationManager.delegate = self;
-    if ([CLLocationManager locationServicesEnabled]) {
-      CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
-      if(status == kCLAuthorizationStatusAuthorizedWhenInUse || status == kCLAuthorizationStatusAuthorizedAlways){
-        resolve(@YES);
-       
-      }else{
-        [locationManager requestWhenInUseAuthorization];
-        resolve(false);
-        
-      }
-    }else{
-      [locationManager requestWhenInUseAuthorization];
-      resolve(false);
-    }
+       locationManager.delegate = self;
+       if ([CLLocationManager locationServicesEnabled]) {
+         CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
+         if(status == kCLAuthorizationStatusAuthorizedWhenInUse || status == kCLAuthorizationStatusAuthorizedAlways){
+           resolve(@YES);
+          
+         }else{
+           [locationManager requestWhenInUseAuthorization];
+           resolve(false);
+           
+         }
+       }else{
+         [locationManager requestWhenInUseAuthorization];
+         resolve(false);
+       }
     }
 
 //else{
