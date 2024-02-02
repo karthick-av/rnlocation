@@ -1,5 +1,4 @@
 
-import {  Platform } from 'react-native';
 export type location_options ={
   timeout: number,
   gps_timeout: number
