@@ -1,6 +1,6 @@
 
 
-import { NativeModules, Platform } from 'react-native';
+import { NativeModules, Platform, Alert } from 'react-native';
 import { DEFAULT_OPTIONS, MODULE_NAME, type LOCATION_RESPONSE, type location_options } from './utils';
 
 const { [MODULE_NAME]: modules } = NativeModules;
@@ -45,7 +45,10 @@ class RNLocation {
   }
 
   static WifiSettings = (): void => {
-    if(Platform.OS == "ios") return;
+    if(Platform.OS == "ios") {
+      Alert.alert(" Please turn on the wifi.");
+      return;
+    }
     modules.WifiSettings();
   }
 
